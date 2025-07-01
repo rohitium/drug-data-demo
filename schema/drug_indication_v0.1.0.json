@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "drug_indication",
+    "type": "object",
+    "properties": {
+      "drug_uuid":       { "type": "string", "format": "uuid" },
+      "indication_uuid": { "type": "string", "format": "uuid" }
+    },
+    "required": ["drug_uuid", "indication_uuid"],
+    "additionalProperties": false
+  }
+  

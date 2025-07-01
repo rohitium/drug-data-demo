@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "drug_molecule",
+    "type": "object",
+    "properties": {
+      "drug_uuid":     { "type": "string", "format": "uuid" },
+      "molecule_uuid": { "type": "string", "format": "uuid" }
+    },
+    "required": ["drug_uuid", "molecule_uuid"],
+    "additionalProperties": false
+  }
+  

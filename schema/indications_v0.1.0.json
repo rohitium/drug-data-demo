@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "indications",
+    "type": "object",
+    "properties": {
+      "indication_uuid": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "indication_text": { "type": "string" }
+    },
+    "required": ["indication_uuid", "indication_text"],
+    "additionalProperties": false
+  }
+  
