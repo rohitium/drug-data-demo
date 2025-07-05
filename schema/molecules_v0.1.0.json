@@ -1,15 +1,19 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "molecules",
-    "type": "object",
-    "properties": {
-      "molecule_uuid": {
-        "type": "string",
-        "format": "uuid"
-      },
-      "active_ingredient": { "type": "string" }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "molecules",
+  "type": "object",
+  "properties": {
+    "molecule_uuid": {
+      "type": "string",
+      "format": "uuid"
     },
-    "required": ["molecule_uuid", "active_ingredient"],
-    "additionalProperties": false
-  }
-  
+    "active_ingredient": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "molecule_uuid",
+    "active_ingredient"
+  ],
+  "additionalProperties": false
+}

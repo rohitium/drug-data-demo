@@ -43,6 +43,9 @@ echo "✅  AWS CLI profile '$AWS_PROFILE' looks good"
 echo -e "\n▶  ingest_fda.py"
 python ingest_fda.py
 
+echo -e "\n▶  build_schema.py"
+python build_schema.py
+
 echo -e "\n▶  validate.py"
 python validate.py
 
