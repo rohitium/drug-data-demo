@@ -1,0 +1,11 @@
+# core data / storage
+pandas>=2.1
+pyarrow>=14.0
+s3fs>=2024.3      # gives pandas transparent S3 read/write
+
+# HTTP + validation
+requests>=2.32
+jsonschema>=4.24
+
+# console formatting
+tabulate>=0.9      # used by pandas.DataFrame.to_markdown()
