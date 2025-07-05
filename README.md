@@ -37,8 +37,8 @@ ingest_fda.py ───► Parquet files ───► S3 bucket  (drug-data-demo
 ```bash
 git clone https://github.com/rohitium/drug-data-demo.git
 cd drug-data-demo
-chmod +x run_pipeline.sh
-./run_pipeline.sh
+chmod +x run_ingest.sh
+./run_ingest.sh
 ```
 
 The script will
@@ -81,7 +81,7 @@ python validate.py
 | `validate.py`           | Loads ALL tables from S3, enforces schema + PK uniqueness + FK existence                                  |
 | `preview_to_console.py` | Quick CLI snapshot                                                                                        |
 | `preview_to_html.py`    | Generates `<docs/index.html>` (GitHub Pages)                                                              |
-| `run_pipeline.sh`       | One-click orchestrator incl. env bootstrap                                                                |
+| `run_ingest.sh`         | One-click orchestrator incl. env bootstrap                                                                |
 
 ---
 
