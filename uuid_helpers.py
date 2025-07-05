@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+Helpers for deterministic UUIDs.
+"""
+
 import uuid
 NS_DRUG      = uuid.uuid5(uuid.NAMESPACE_URL,  "fdadata/drug")
 NS_MOLECULE  = uuid.uuid5(uuid.NAMESPACE_URL,  "fdadata/molecule")
