@@ -3,7 +3,8 @@
 Validate Parquet tables against JSON Schema.
 """
 
-import pandas as pd, json, config as C, utils as U
+import pandas as pd, json
+from drug_data_demo import config as C, utils as U
 
 dfs = {t: pd.read_parquet(f"{C.S3_BUCKET}{t}.parquet",
                           storage_options={"profile": C.AWS_PROFILE})

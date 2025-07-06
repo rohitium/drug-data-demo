@@ -3,7 +3,8 @@
 Pretty-print a 5-row preview of each primary table.
 """
 
-import pandas as pd, config as C
+import pandas as pd
+from drug_data_demo import config as C
 
 for tbl in C.PRIMARY:
     df = pd.read_parquet(

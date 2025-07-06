@@ -3,7 +3,7 @@
 import re, requests, json
 from typing import List, Optional, Dict
 from jsonschema import Draft7Validator
-import config as C
+from drug_data_demo import config as C
 import pandas as pd
 
 # ---------------- openFDA helpers ----------------

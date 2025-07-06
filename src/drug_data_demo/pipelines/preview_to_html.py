@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import pandas as pd, datetime, pathlib, config as C
+import pandas as pd, datetime, pathlib
+from drug_data_demo import config as C
 
 parts = ["<h1>Drug-data demo preview</h1>",
          f"<p>Generated {datetime.date.today()}</p>"]

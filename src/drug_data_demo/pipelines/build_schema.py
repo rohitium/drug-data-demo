@@ -7,7 +7,9 @@ Usage:
 """
 
 from pathlib import Path
-import json, pandas as pd, config as C
+import json, pandas as pd
+
+from drug_data_demo import config as C
 
 SCHEMA_DIR = Path("schema")
 SCHEMA_DIR.mkdir(exist_ok=True)

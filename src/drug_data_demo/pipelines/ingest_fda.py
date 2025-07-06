@@ -6,8 +6,8 @@ via openFDA.
 
 import tempfile, subprocess, os, pandas as pd
 from collections import OrderedDict
-from uuid_helpers import *
-import utils as U, config as C
+from drug_data_demo.uuid_helpers import *
+from drug_data_demo import utils as U, config as C
 
 DRUGS = OrderedDict([
     ("125514", "Keytruda"),
