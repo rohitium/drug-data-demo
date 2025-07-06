@@ -1,9 +1,9 @@
-### Drug-Data Demo  ·  OpenFDA → ETL → S3
+### Drug-Data Demo · OpenFDA → ETL → S3
 
 ---
 
 A reproducible mini-pipeline that **ingests FDA-regulated drug data**, assigns
-deterministic UUIDs, auto-generates JSON Schema, validates, and publishes both
+deterministic UUIDs, auto-generates JSON-Schema, validates, and publishes both
 raw Parquet and human-readable previews.
 
 🔗 **Live preview:** [https://rohitium.github.io/drug-data-demo/](https://rohitium.github.io/drug-data-demo/)
@@ -12,76 +12,80 @@ raw Parquet and human-readable previews.
 openFDA (REST)
         │
         ▼
-ingest_fda.py ───► Parquet files ───► S3 bucket  (drug-data-demo-release)
-                    (drugs, molecules, indications, moas,
-                     plus mapping tables: drug_molecule / drug_indication / drug_moa)
-        │                                   │
-        │                                   ├─ validate.py        → QC report (schema + FK)
-        │                                   └─ preview_to_*       → Markdown / HTML preview
+src/drug_data_demo/pipelines/ingest_fda.py
+        │                 ┌──── Parquet ──► S3  bucket  (drug-data-demo-release)
+        │                 │                └── 4 primary + 3 mapping tables
+        │                 │
+        │                 ├─ build_schema.py       → schema/*.json  (draft-07)
+        │                 ├─ validate.py           → JSON-Schema + FK QC
+        │                 ├─ preview_to_console.py → Markdown in terminal
+        │                 └─ preview_to_html.py    → docs/index.html (GitHub Pages)
         │
-        └─ build_schema.py  → schema/*.json (draft-07, auto-derived)
+scripts/run_ingest.sh  – one-click orchestrator (env + pipeline)
 ```
 
 ---
 
 ## Quick-start
 
-### 0. Prereqs
+### 0 · Prerequisites
 
-* **Conda** (Miniconda ≥ 23) and **AWS CLI** configured with profile `demo`
-* Write-only access to S3 bucket `drug-data-demo-release`
-* *Optional:* `OPENFDA_API_KEY` to raise rate limits
+| Need        | Notes                                                                   |
+| ----------- | ----------------------------------------------------------------------- |
+| **Conda**   | Miniconda ≥ 23 ( `conda` on PATH )                                      |
+| **AWS CLI** | profile **`demo`** with write access to `drug-data-demo-release` bucket |
+| *Optional*  | `export OPENFDA_API_KEY=…` to avoid rate limits                         |
 
-### 1. Clone & run
+### 1 · Clone & run
 
 ```bash
 git clone https://github.com/rohitium/drug-data-demo.git
 cd drug-data-demo
-chmod +x run_ingest.sh
-./run_ingest.sh
+chmod +x scripts/run_ingest.sh
+./scripts/run_ingest.sh
 ```
 
-The script will
+The helper script will
 
-1. create/activate Conda env **`drug-demo`**
-2. `pip install -r requirements.txt`
-3. sanity-check `OPENFDA_API_KEY` and AWS credentials
-4. run in order:
+1. create / activate Conda env **`drug-demo`**
+2. `pip install -r requirements.txt && pip install -e .`
+3. verify `OPENFDA_API_KEY` (if any) and AWS profile
+4. execute, in order:
 
-   * **`ingest_fda.py`** – pull 5 demo drugs, write & upload Parquet
-   * **`build_schema.py`** – derive `schema/*.json` from Parquet columns
-   * **`validate.py`** – JSON-Schema + FK integrity check
-   * **`preview_to_console.py`** – 5-row Markdown preview to terminal
-   * **`preview_to_html.py`** – rebuild `docs/index.html` for GitHub Pages
+   | step              | module                                                  |
+   | ----------------- | ------------------------------------------------------- |
+   | ingest            | `python -m drug_data_demo.pipelines.ingest_fda`         |
+   | schema            | `python -m drug_data_demo.pipelines.build_schema`       |
+   | validate          | `python -m drug_data_demo.pipelines.validate`           |
+   | preview (console) | `python -m drug_data_demo.pipelines.preview_to_console` |
+   | preview (HTML)    | `python -m drug_data_demo.pipelines.preview_to_html`    |
 
-### 2. Manual commands
+### 2 · Manual commands
 
 ```bash
-# refresh data
-python ingest_fda.py
+# pull fresh data & upload parquet
+python -m drug_data_demo.pipelines.ingest_fda
 
-# re-generate JSON Schema
-python build_schema.py
+# regenerate draft-07 JSON-Schema
+python -m drug_data_demo.pipelines.build_schema
 
-# validate everything directly from S3
-python validate.py
+# QC directly from S3
+python -m drug_data_demo.pipelines.validate
 ```
 
 ---
 
-## How it works — modules in 1 minute
+## Code tour (src/)
 
-| File                    | Purpose                                                                                                   |
-| ----------------------- | --------------------------------------------------------------------------------------------------------- |
-| `uuid_helpers.py`       | Namespace UUID⁵ generator ⇒ stable keys across runs                                                       |
-| `config.py`             | Central constants: S3 bucket, API URLs, table lists                                                       |
-| `utils.py`              | Re-usable helpers (openFDA calls, first-sentence, schema/FK checks)                                       |
-| `ingest_fda.py`         | **Core ETL**: calls openFDA, normalises into 4 primary + 3 mapping tables, streams Parquet straight to S3 |
-| `build_schema.py`       | Reads each Parquet, infers JSON types, writes `schema/<table>_v0.1.0.json` (draft-07)                     |
-| `validate.py`           | Loads ALL tables from S3, enforces schema + PK uniqueness + FK existence                                  |
-| `preview_to_console.py` | Quick CLI snapshot                                                                                        |
-| `preview_to_html.py`    | Generates `<docs/index.html>` (GitHub Pages)                                                              |
-| `run_ingest.sh`         | One-click orchestrator incl. env bootstrap                                                                |
+| Path                                 | Purpose                                                                     |
+| ------------------------------------ | --------------------------------------------------------------------------- |
+| **`drug_data_demo/config.py`**       | Central constants: S3 bucket, API URLs, table lists                         |
+| **`drug_data_demo/uuid_helpers.py`** | Namespace-UUID generator ⇒ stable keys across runs                          |
+| **`drug_data_demo/utils.py`**        | Shared helpers (openFDA call wrapper, first-sentence, schema/FK validators) |
+| **pipelines/**                       | five runnable modules (ingest / schema / validate / previews)               |
+| **schema/**                          | auto-derived draft-07 JSON-Schema files                                     |
+| **docs/**                            | GitHub Pages site (written by `preview_html.py`)                            |
+| **scripts/run_ingest.sh**            | one-click pipeline + env bootstrap                                          |
 
 ---
 
@@ -89,37 +93,35 @@ python validate.py
 
 ### 1 · More openFDA endpoints
 
-* **Clinical trials:** `/drug/drugtrial.json`
-* **Adverse events:** `/drug/event.json`
-* **Drug interactions / contraindications / BB warnings:** additional arrays inside `/drug/label.json`
-* **PK/PD & pharmacogenomics:** `/drug/ndc.json` and structured “pharm\_class\_\*” fields
+* Clinical trials `/drug/drugtrial.json`
+* Adverse events `/drug/event.json`
+* Interactions / BB warnings inside `/drug/label.json`
+* PK/PD & pharmacogenomics `/drug/ndc.json`
 
-Add a new extractor function in `ingest_fda.py`, append to `tables{}` dict;
-`build_schema.py` + `validate.py` adapt automatically because they iterate
-over `config.ALL`.
+Add an extractor in **`ingest_fda.py`**, append to the `tables` dict; schema and
+validation adapt automatically because they iterate over `config.ALL`.
 
-### 2 · FDA Advisory Committee documents
+### 2 · FDA Advisory-Committee documents
 
-Scrape PDF / HTML from meeting pages (e.g. cardio-renal 10 Oct 2024) using
-`requests + BeautifulSoup`, stash key metadata and the S3 object key in a new
-`advisory_docs` table, map to `drug_uuid` via application number.
+Scrape PDFs from meeting pages (e.g. cardio-renal - Oct 2024) with
+`requests + beautifulsoup4`, upload to S3, and store metadata in a new
+`advisory_docs` table keyed by `drug_uuid`.
 
 ### 3 · PubMed / ClinicalTrials.gov fusion
 
-* **PubMed:** Entrez API → store pmid, abstract, MeSH into `pubmed.parquet`
-* **CT.gov:** bulk‐download TSV → filter by intervention, link NCT↔drug\_uuid via
-  active ingredient or synonym table.
+* **PubMed Entrez** → store `pmid`, abstract, MeSH in `pubmed.parquet`
+* **CT.gov bulk TSV** → link `nct_id` ↔ `drug_uuid` via active-ingredient map
 
-Because every table gets a deterministic UUID namespace you can attach new
-mapping tables (`drug_pubmed`, `drug_clinical_trial`) without touching core
-logic—validation & schema auto-generate will cover them.
+Each new table can be primary or mapping; deterministic UUID namespaces keep PK
+and FK logic intact and auto-schema continues to work.
 
 ---
 
-## Security / cost notes
+## Security & cost
 
-* Writes to S3 use **single PUT per file**; <1 MB total on the demo.
-* Reads use `s3fs`’ streaming driver; no tmp files on disk.
-* If you ingest thousands of drugs, move to **polars** or **DuckDB** to keep memory constant.
+* Upload: **one PUT per table**, < 1 MB total for the demo
+* Read: streaming via `s3fs` (no local temp files)
+* For thousands of drugs, swap `pandas` for **Polars** or **DuckDB** to stay
+  memory-efficient.
 
----
+PRs welcome!
